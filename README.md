@@ -1,7 +1,7 @@
 # 第三方支付接入demo
 微信支付、支付宝支付常用接口，spring版; 配置即可用, 无需修改
 
-基于 https://github.com/Pay-Group/best-pay-sdk此开源项目做了修改
+基于 https://github.com/Pay-Group/best-pay-sdk  此开源项目做了修改
 
 ## 支持接口
 #### 支付宝
