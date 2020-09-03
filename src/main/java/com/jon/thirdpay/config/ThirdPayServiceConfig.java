@@ -1,4 +1,4 @@
-package com.jon.thirdpay.config.common;
+package com.jon.thirdpay.config;
 
 import com.jon.thirdpay.config.AliPayAppConfig;
 import com.jon.thirdpay.config.WxPayAppConfig;

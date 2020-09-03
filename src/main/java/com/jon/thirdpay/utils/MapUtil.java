@@ -19,8 +19,8 @@ import java.util.Map;
  * Created by null on 2017/2/14.
  */
 public class MapUtil {
-
     final static ObjectMapper objectMapper;
+
     static {
         objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -28,6 +28,7 @@ public class MapUtil {
 
     /**
      * 对象转map
+     *
      * @param obj
      * @return
      */
@@ -54,21 +55,34 @@ public class MapUtil {
         }
         return map;
     }
+
     /**
      * 表单字符串转化成 hashMap
-     * @param orderinfo
+     *
+     * @param str
      * @return
      */
-    public static HashMap<String, String> form2Map( String orderinfo) {
-        String listinfo[];
-        HashMap<String, String> map = new HashMap<String, String>();
-        listinfo = orderinfo.split("&");
-        for(String s : listinfo)
-        {
-            String list[]  = s.split("=");
-            if(list.length>1)
-            {
-                map.put(list[0], list[1]);
+    public static HashMap<String, String> form2Map(String str) {
+        return form2Map(false, str);
+    }
+
+    /**
+     * 表单字符串转化成 hashMap
+     *
+     * @param str
+     * @param toCamelCase 是否： 将具有下划线的key转换为小驼峰
+     * @return
+     */
+    public static HashMap<String, String> form2Map(boolean toCamelCase, String str) {
+        HashMap<String, String> map = new HashMap<>();
+        String[] split = str.split("&");
+        for (String s : split) {
+            String name = s.substring(0, s.indexOf("="));
+            String value = s.substring(s.indexOf("=") + 1);
+            if (toCamelCase) {
+                map.put(CamelCaseUtil.toCamelCase(name), value);
+            } else {
+                map.put(name, value);
             }
         }
         return map;
@@ -76,27 +90,17 @@ public class MapUtil {
 
     /**
      * 表单字符串转化成 hashMap，将具有下划线的key转换为小驼峰
-     * @param orderinfo,
+     *
+     * @param str,
      * @return
      */
-    public static HashMap<String, String> form2MapWithCamelCase( String orderinfo) {
-        String listinfo[];
-        HashMap<String, String> map = new HashMap<String, String>();
-        listinfo = orderinfo.split("&");
-        for(String s : listinfo)
-        {
-            String list[]  = s.split("=");
-            if(list.length>1)
-            {
-                map.put(CamelCaseUtil.toCamelCase(list[0]),list[1]);
-            }
-        }
-        return map;
+    public static HashMap<String, String> form2MapWithCamelCase(String str) {
+        return form2Map(true, str);
     }
 
-    public static <T> T mapToObject(Object obj,Class<T> clazz) {
+    public static <T> T mapToObject(Object obj, Class<T> clazz) {
         try {
-            return objectMapper.readValue(serialize(obj),clazz);
+            return objectMapper.readValue(serialize(obj), clazz);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,4 +1,4 @@
-package com.jon.thirdpay.config.common;
+package com.jon.thirdpay.common;
 
 /**
  * @author testjon 2020-08-06

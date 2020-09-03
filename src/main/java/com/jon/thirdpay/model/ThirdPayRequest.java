@@ -15,7 +15,6 @@ public class ThirdPayRequest {
      * 支付方式.
      */
     private ThirdPayTypeEnum payTypeEnum;
-
     /**
      * 订单号.
      */
@@ -29,7 +28,7 @@ public class ThirdPayRequest {
     /**
      * 订单名字.
      */
-    private String orderName;
+    private String orderTitle;
 
     /**
      * 微信openid, 仅微信公众号/小程序支付时需要

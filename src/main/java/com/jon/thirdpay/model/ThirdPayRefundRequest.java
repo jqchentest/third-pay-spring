@@ -27,7 +27,12 @@ public class ThirdPayRefundRequest {
     private String outTradeNo;
 
     /**
-     * 订单金额.
+     * 退款金额.
      */
-    private BigDecimal orderAmount;
+    private BigDecimal refundAmount;
+
+    /**
+     * 用户ID
+     */
+    private Integer userId;
 }

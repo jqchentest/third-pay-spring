@@ -1,10 +1,16 @@
 package com.jon.thirdpay.model.wxpay.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jon.thirdpay.service.impl.wxpay.WxPaySignature;
+import com.jon.thirdpay.utils.RandomUtil;
 import lombok.Data;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 微信统一下单返回结果
+ *
  * @author testjon 2020-08-05
  */
 @Data
@@ -40,4 +46,31 @@ public class WxCreateOrderResponse {
      */
     private String sign;
 
+
+    public static WxCreateOrderResponse create(WxUnifiedOrderResponse response, String mchKey) {
+        String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
+        String nonceStr = RandomUtil.getRandomStr();
+        String prepayId = response.getPrepayId();
+        String packAge = "Sign=WXPay";
+
+        //先构造要签名的map
+        Map<String, String> map = new HashMap<>();
+        map.put("appid", response.getAppid());
+        map.put("partnerid", response.getMchId());
+        map.put("prepayid", prepayId);
+        map.put("package", packAge);
+        map.put("noncestr", nonceStr);
+        map.put("timestamp", timeStamp);
+
+        //返回的内容
+        WxCreateOrderResponse payResponse = new WxCreateOrderResponse();
+        payResponse.setAppId(response.getAppid());
+        payResponse.setPartnerId(response.getMchId());
+        payResponse.setPrepayId(prepayId);
+        payResponse.setPackAge(packAge);
+        payResponse.setNonceStr(nonceStr);
+        payResponse.setTimeStamp(timeStamp);
+        payResponse.setSign(WxPaySignature.sign(map, mchKey));
+        return payResponse;
+    }
 }

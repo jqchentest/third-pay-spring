@@ -1,6 +1,6 @@
 package com.jon.thirdpay.service;
 
-import com.jon.thirdpay.config.common.ResponseData;
+import com.jon.thirdpay.common.ResponseData;
 import com.jon.thirdpay.enums.SignType;
 import com.jon.thirdpay.model.*;
 

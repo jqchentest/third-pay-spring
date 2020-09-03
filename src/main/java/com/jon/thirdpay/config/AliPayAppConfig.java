@@ -1,6 +1,5 @@
 package com.jon.thirdpay.config;
 
-import com.jon.thirdpay.config.common.AliPayConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Value;

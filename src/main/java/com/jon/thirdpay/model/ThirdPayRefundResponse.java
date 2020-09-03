@@ -1,5 +1,8 @@
 package com.jon.thirdpay.model;
 
+import com.alipay.api.response.AlipayTradeRefundResponse;
+import com.jon.thirdpay.model.wxpay.response.WxRefundResponse;
+import com.jon.thirdpay.utils.MoneyUtil;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -16,9 +19,9 @@ public class ThirdPayRefundResponse {
     private String tradeNo;
 
     /**
-     * 订单金额.
+     * 退款金额.
      */
-    private BigDecimal orderAmount;
+    private BigDecimal refundAmount;
 
     /**
      * 第三方支付流水号.
@@ -35,5 +38,33 @@ public class ThirdPayRefundResponse {
      */
     private String outRefundNo;
 
+    /**
+     * 买家外部用户id
+     */
+    private String outBuyerUserId;
 
+    /**
+     * 买家外部的登录id
+     */
+    private String outBuyerLoginId;
+
+    public static ThirdPayRefundResponse create(WxRefundResponse response) {
+        ThirdPayRefundResponse thirdPayRefundResponse = new ThirdPayRefundResponse();
+        thirdPayRefundResponse.setTradeNo(response.getOutTradeNo());
+        thirdPayRefundResponse.setRefundAmount(MoneyUtil.Fen2Yuan(response.getTotalFee()));
+        thirdPayRefundResponse.setOutTradeNo(response.getTransactionId());
+        thirdPayRefundResponse.setRefundNo(response.getOutRefundNo());
+        thirdPayRefundResponse.setOutRefundNo(response.getOutRefundNo());
+        return thirdPayRefundResponse;
+    }
+
+    public static ThirdPayRefundResponse create(AlipayTradeRefundResponse response) {
+        ThirdPayRefundResponse thirdPayRefundResponse = new ThirdPayRefundResponse();
+        thirdPayRefundResponse.setTradeNo(response.getOutTradeNo());
+        thirdPayRefundResponse.setRefundAmount(new BigDecimal(response.getRefundFee()));
+        thirdPayRefundResponse.setOutTradeNo(response.getTradeNo());
+        thirdPayRefundResponse.setOutBuyerLoginId(response.getBuyerLogonId());
+        thirdPayRefundResponse.setOutBuyerUserId(response.getBuyerUserId());
+        return thirdPayRefundResponse;
+    }
 }

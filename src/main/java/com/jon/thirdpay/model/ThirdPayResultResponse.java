@@ -1,12 +1,15 @@
 package com.jon.thirdpay.model;
 
-import com.jon.thirdpay.enums.ThirdPayPlatformEnum;
+import com.jon.thirdpay.model.alipay.response.AliPayAsyncResponse;
+import com.jon.thirdpay.model.wxpay.response.WxPayAsyncResponse;
+import com.jon.thirdpay.utils.MoneyUtil;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 /**
  * 支付结果响应类
+ *
  * @author testjon 2020/8/3.
  */
 @Data
@@ -24,8 +27,20 @@ public class ThirdPayResultResponse {
      */
     private String outTradeNo;
 
-    /**
-     * 支付平台
-     */
-    private ThirdPayPlatformEnum payPlatformEnum;
+    public static ThirdPayResultResponse create(WxPayAsyncResponse response) {
+        ThirdPayResultResponse payResponse = new ThirdPayResultResponse();
+        payResponse.setOrderAmount(MoneyUtil.Fen2Yuan(response.getTotalFee()));
+        payResponse.setTradeNo(response.getOutTradeNo());
+        payResponse.setOutTradeNo(response.getTransactionId());
+        return payResponse;
+    }
+
+    public static ThirdPayResultResponse create(AliPayAsyncResponse response) {
+        ThirdPayResultResponse successResponse = new ThirdPayResultResponse();
+        successResponse.setOrderAmount(new BigDecimal(response.getTotalAmount()));
+        successResponse.setTradeNo(response.getOutTradeNo());
+        successResponse.setOutTradeNo(response.getTradeNo());
+        return successResponse;
+    }
+
 }

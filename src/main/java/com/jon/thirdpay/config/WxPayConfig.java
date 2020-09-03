@@ -1,4 +1,4 @@
-package com.jon.thirdpay.config.common;
+package com.jon.thirdpay.config;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

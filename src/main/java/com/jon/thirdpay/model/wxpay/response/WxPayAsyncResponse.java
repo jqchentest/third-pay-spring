@@ -6,8 +6,7 @@ import org.simpleframework.xml.Root;
 
 /**
  * 微信支付 支付结果异步返回参数
- * Created by 廖师兄
- * 2017-07-02 20:55
+ * @author testjon 2020-08-05
  */
 @Data
 @Root(name = "xml", strict = false)
@@ -19,9 +18,7 @@ public class WxPayAsyncResponse {
     @Element(name = "return_msg", required = false)
     private String returnMsg;
 
-    /**
-     * 以下字段在return_code为SUCCESS的时候有返回.
-     */
+    /** 以下字段在return_code为SUCCESS的时候有返回. */
     @Element(name = "appid", required = false)
     private String appid;
 

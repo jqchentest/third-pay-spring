@@ -1,12 +1,11 @@
 package com.jon.thirdpay.service.impl.wxpay;
 
-import com.jon.thirdpay.config.common.BusinessException;
-import com.jon.thirdpay.config.common.ResponseData;
-import com.jon.thirdpay.enums.SignType;
-import com.jon.thirdpay.config.common.WxPayConfig;
+import com.jon.thirdpay.common.BusinessException;
+import com.jon.thirdpay.common.ResponseData;
+import com.jon.thirdpay.config.WxPayConfig;
 import com.jon.thirdpay.constants.WxPayConstants;
+import com.jon.thirdpay.enums.SignType;
 import com.jon.thirdpay.enums.ThirdPayOrderStatusEnum;
-import com.jon.thirdpay.enums.ThirdPayPlatformEnum;
 import com.jon.thirdpay.model.*;
 import com.jon.thirdpay.model.wxpay.WxPayApi;
 import com.jon.thirdpay.model.wxpay.request.WxDownloadBillRequest;
@@ -79,7 +78,7 @@ public class WxPayServiceImpl implements ThirdPayService {
             WxPayUnifiedorderRequest wxRequest = new WxPayUnifiedorderRequest();
             wxRequest.setOutTradeNo(request.getTradeNo());
             wxRequest.setTotalFee(MoneyUtil.Yuan2Fen(request.getOrderAmount()));
-            wxRequest.setBody(request.getOrderName());
+            wxRequest.setBody(request.getOrderTitle());
             wxRequest.setOpenid(request.getOpenid());
             wxRequest.setTradeType(request.getPayTypeEnum().getCode());
             wxRequest.setAppid(wxPayConfig.getAppId());
@@ -107,7 +106,7 @@ public class WxPayServiceImpl implements ThirdPayService {
                 throw new BusinessException("微信统一下单失败, 请稍后再试");
             }
 
-            return buildCreateOrderResponse(response);
+            return ResponseData.success(WxCreateOrderResponse.create(response, wxPayConfig.getMchKey()));
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
@@ -131,7 +130,7 @@ public class WxPayServiceImpl implements ThirdPayService {
     public ThirdPayResultResponse asyncNotify(String notifyData) {
         //签名校验
         if (!WxPaySignature.verify(XmlUtil.toMap(notifyData), wxPayConfig.getMchKey())) {
-            log.warn("【微信支付异步通知】发起退款失败, notifyData:{}", notifyData);
+            log.warn("【微信支付异步通知】校验失败, notifyData:{}", notifyData);
             throw new BusinessException("微信支付, 校验失败");
         }
 
@@ -146,7 +145,7 @@ public class WxPayServiceImpl implements ThirdPayService {
         //该订单已支付直接返回
         if (!asyncResponse.getResultCode().equals(WxPayConstants.SUCCESS)
                 && asyncResponse.getErrCode().equals("ORDERPAID")) {
-            return buildCreateOrderResponse(asyncResponse);
+            return ThirdPayResultResponse.create(asyncResponse);
         }
 
         if (!asyncResponse.getResultCode().equals(WxPayConstants.SUCCESS)) {
@@ -154,7 +153,7 @@ public class WxPayServiceImpl implements ThirdPayService {
             throw new BusinessException("微信支付失败");
         }
 
-        return buildCreateOrderResponse(asyncResponse);
+        return ThirdPayResultResponse.create(asyncResponse);
     }
 
     /**
@@ -169,8 +168,8 @@ public class WxPayServiceImpl implements ThirdPayService {
             wxRequest.setOutTradeNo(request.getTradeNo());
             wxRequest.setOutRefundNo(request.getTradeNo());
             wxRequest.setTransactionId(request.getOutTradeNo());
-            wxRequest.setTotalFee(MoneyUtil.Yuan2Fen(request.getOrderAmount()));
-            wxRequest.setRefundFee(MoneyUtil.Yuan2Fen(request.getOrderAmount()));
+            wxRequest.setTotalFee(MoneyUtil.Yuan2Fen(request.getRefundAmount()));
+            wxRequest.setRefundFee(MoneyUtil.Yuan2Fen(request.getRefundAmount()));
 
             wxRequest.setAppid(wxPayConfig.getAppId());
             wxRequest.setMchId(wxPayConfig.getMchId());
@@ -197,7 +196,7 @@ public class WxPayServiceImpl implements ThirdPayService {
                 throw new BusinessException("微信退款失败,请稍后再试");
             }
 
-            return buildRefundResponse(response);
+            return ThirdPayRefundResponse.create(response);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
@@ -255,55 +254,6 @@ public class WxPayServiceImpl implements ThirdPayService {
             log.error("【微信订单查询】, 发生异常 request:{},e: ", request, e);
             throw new RuntimeException(e);
         }
-    }
-
-    private ThirdPayRefundResponse buildRefundResponse(WxRefundResponse response) {
-        ThirdPayRefundResponse thirdPayRefundResponse = new ThirdPayRefundResponse();
-        thirdPayRefundResponse.setTradeNo(response.getOutTradeNo());
-        thirdPayRefundResponse.setOrderAmount(MoneyUtil.Fen2Yuan(response.getTotalFee()));
-        thirdPayRefundResponse.setOutTradeNo(response.getTransactionId());
-        thirdPayRefundResponse.setRefundNo(response.getOutRefundNo());
-        thirdPayRefundResponse.setOutRefundNo(response.getOutRefundNo());
-        return thirdPayRefundResponse;
-    }
-
-    private ThirdPayResultResponse buildCreateOrderResponse(WxPayAsyncResponse response) {
-        ThirdPayResultResponse payResponse = new ThirdPayResultResponse();
-        payResponse.setPayPlatformEnum(ThirdPayPlatformEnum.WX);
-        payResponse.setOrderAmount(MoneyUtil.Fen2Yuan(response.getTotalFee()));
-        payResponse.setTradeNo(response.getOutTradeNo());
-        payResponse.setOutTradeNo(response.getTransactionId());
-        return payResponse;
-    }
-
-    /**
-     * 返回给APP的参数
-     */
-    private ResponseData<WxCreateOrderResponse> buildCreateOrderResponse(WxUnifiedOrderResponse response) {
-        String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
-        String nonceStr = RandomUtil.getRandomStr();
-        String prepayId = response.getPrepayId();
-        String packAge = "Sign=WXPay";
-
-        //先构造要签名的map
-        Map<String, String> map = new HashMap<>();
-        map.put("appId", response.getAppid());
-        map.put("partnerid", response.getMchId());
-        map.put("prepayid", prepayId);
-        map.put("package", packAge);
-        map.put("nonceStr", nonceStr);
-        map.put("timeStamp", timeStamp);
-
-        //返回的内容
-        WxCreateOrderResponse payResponse = new WxCreateOrderResponse();
-        payResponse.setAppId(response.getAppid());
-        payResponse.setPartnerId(response.getMchId());
-        payResponse.setPrepayId(prepayId);
-        payResponse.setPackAge(packAge);
-        payResponse.setNonceStr(nonceStr);
-        payResponse.setTimeStamp(timeStamp);
-        payResponse.setSign(WxPaySignature.sign(map, wxPayConfig.getMchKey()));
-        return ResponseData.success(payResponse);
     }
 
     /**

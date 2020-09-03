@@ -1,6 +1,5 @@
 package com.jon.thirdpay.config;
 
-import com.jon.thirdpay.config.common.WxPayConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

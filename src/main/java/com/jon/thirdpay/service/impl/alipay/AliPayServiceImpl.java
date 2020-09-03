@@ -13,13 +13,12 @@ import com.alipay.api.response.AlipayDataDataserviceBillDownloadurlQueryResponse
 import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeRefundResponse;
-import com.jon.thirdpay.config.common.AliPayConfig;
-import com.jon.thirdpay.config.common.BusinessException;
-import com.jon.thirdpay.config.common.ResponseData;
-import com.jon.thirdpay.enums.SignType;
+import com.jon.thirdpay.common.BusinessException;
+import com.jon.thirdpay.common.ResponseData;
+import com.jon.thirdpay.config.AliPayConfig;
 import com.jon.thirdpay.constants.AliPayConstants;
 import com.jon.thirdpay.enums.AlipayTradeStatusEnum;
-import com.jon.thirdpay.enums.ThirdPayPlatformEnum;
+import com.jon.thirdpay.enums.SignType;
 import com.jon.thirdpay.model.*;
 import com.jon.thirdpay.model.alipay.response.AliPayAsyncResponse;
 import com.jon.thirdpay.service.ThirdPayService;
@@ -27,7 +26,6 @@ import com.jon.thirdpay.utils.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -36,8 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 支付宝支付
- * @author testjon 2020-08-06
+ * Created by this on 2019/9/8 15:50
  */
 @Slf4j
 public class AliPayServiceImpl implements ThirdPayService {
@@ -82,7 +79,7 @@ public class AliPayServiceImpl implements ThirdPayService {
         //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         //model.setBody("商品详情");
-        model.setSubject(thirdPayRequest.getOrderName());
+        model.setSubject(thirdPayRequest.getOrderTitle());
         model.setOutTradeNo(thirdPayRequest.getTradeNo());
         model.setTimeoutExpress(TIMEOUT_EXPRESS);
         model.setTotalAmount(thirdPayRequest.getOrderAmount().toString());
@@ -117,7 +114,7 @@ public class AliPayServiceImpl implements ThirdPayService {
         try {
             notifyData = URLDecoder.decode(notifyData, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("【支付宝支付异步通知】支付失败 notifyData:{}, e:{}", notifyData, e);
+            log.error("【支付宝支付异步通知】回调内容有误 notifyData:{}, e:{}", notifyData, e);
             throw new RuntimeException(e);
         }
         //签名校验
@@ -134,7 +131,7 @@ public class AliPayServiceImpl implements ThirdPayService {
             log.warn("【支付宝支付异步通知】支付失败 notifyData:{},response:{}", notifyData, response);
             throw new BusinessException("【支付宝支付异步通知】支付失败");
         }
-        return buildResponse(response);
+        return ThirdPayResultResponse.create(response);
     }
 
     @Override
@@ -146,7 +143,7 @@ public class AliPayServiceImpl implements ThirdPayService {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("out_trade_no", thirdPayRefundRequest.getTradeNo());
         jsonObject.put("trade_no", thirdPayRefundRequest.getOutTradeNo());
-        jsonObject.put("refund_amount", thirdPayRefundRequest.getTradeNo());
+        jsonObject.put("refund_amount", thirdPayRefundRequest.getRefundAmount());
         request.setBizContent(jsonObject.toJSONString());
         AlipayTradeRefundResponse response = null;
         try {
@@ -159,15 +156,7 @@ public class AliPayServiceImpl implements ThirdPayService {
             log.warn("【支付宝退款】退款失败, request:{}, response:{}", thirdPayRefundRequest, response);
             throw new BusinessException("支付宝退款失败,请稍后再试");
         }
-        return buildRefundResponse(response);
-    }
-
-    private ThirdPayRefundResponse buildRefundResponse(AlipayTradeRefundResponse response) {
-        ThirdPayRefundResponse thirdPayRefundResponse = new ThirdPayRefundResponse();
-        thirdPayRefundResponse.setTradeNo(response.getOutTradeNo());
-        thirdPayRefundResponse.setOrderAmount(new BigDecimal(response.getRefundFee()));
-        thirdPayRefundResponse.setOutTradeNo(response.getTradeNo());
-        return thirdPayRefundResponse;
+        return ThirdPayRefundResponse.create(response);
     }
 
     @Override
@@ -232,14 +221,4 @@ public class AliPayServiceImpl implements ThirdPayService {
     public String getQrCodeUrl(String productId) {
         return null;
     }
-
-    private ThirdPayResultResponse buildResponse(AliPayAsyncResponse response) {
-        ThirdPayResultResponse successResponse = new ThirdPayResultResponse();
-        successResponse.setPayPlatformEnum(ThirdPayPlatformEnum.ALIPAY);
-        successResponse.setOrderAmount(new BigDecimal(response.getTotalAmount()));
-        successResponse.setTradeNo(response.getOutTradeNo());
-        successResponse.setOutTradeNo(response.getTradeNo());
-        return successResponse;
-    }
-
 }
