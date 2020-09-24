@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * 支付订单查询请求参数
+ * @author testjon 2020-08-05
  */
 @Data
 public class ThirdPayQueryRequest {
@@ -15,9 +16,9 @@ public class ThirdPayQueryRequest {
     private ThirdPayTypeEnum payTypeEnum;
 
     /**
-     * 订单号(orderId 和 outOrderId 二选一，两个都传以outOrderId为准)
+     * 订单号(tradeNo 和 outTradeNo 二选一，两个都传以outTradeNo为准)
      */
-    private String orderId;
+    private String tradeNo;
 
     /**
      * 第三方交易号

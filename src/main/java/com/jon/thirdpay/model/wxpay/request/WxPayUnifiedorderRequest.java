@@ -6,8 +6,6 @@ import org.simpleframework.xml.Root;
 
 /**
  * 微信支付统一下单请求参数
- * Created by 廖师兄
- * 2017-07-02 13:42
  */
 @Data
 @Root(name = "xml", strict = false)

@@ -53,7 +53,7 @@ public class WxPayServiceTest extends BaseTest {
     @Test
     public void query() {
         ThirdPayQueryRequest request = new ThirdPayQueryRequest();
-        request.setOrderId("1");
+        request.setOutTradeNo("1");
         ThirdPayQueryResponse query = getService().query(request);
         System.out.println(query);
     }

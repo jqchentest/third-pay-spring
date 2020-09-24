@@ -64,4 +64,11 @@ public interface ThirdPayService {
      */
     String getQrCodeUrl(String productId);
 
+    /**
+     * 转账至第三方账户
+     * @param request
+     * @return
+     */
+    ThirdPayTransferToAccountResponse transferToAccount(ThirdPayTransferToAccountRequest request) throws Exception;
+
 }

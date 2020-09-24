@@ -3,22 +3,25 @@ package com.jon.thirdpay.enums;
 import lombok.Getter;
 
 /**
- * 订单状态
- * Created by 廖师兄
- * 2018-06-04 16:58
+ * 订单状态枚举
+ *
+ * @author testjon 2020-08-05
  */
 @Getter
 public enum ThirdPayOrderStatusEnum {
 
     SUCCESS("支付成功"),
 
-    REFUND("转入退款"),
+    REFUND("订单已退款"),
 
-    NOTPAY("未支付"),
+    NOTPAY("订单未支付"),
 
-    CLOSED("已关闭"),
+    CLOSED("订单已关闭"),
 
-    REVOKED("已撤销（刷卡支付）"),
+    /**
+     * 已撤销（刷卡支付）
+     */
+    REVOKED("已撤销"),
 
     USERPAYING("用户支付中"),
 

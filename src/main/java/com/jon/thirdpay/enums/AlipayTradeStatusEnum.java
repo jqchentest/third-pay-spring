@@ -4,13 +4,9 @@ import lombok.Getter;
 
 import static com.jon.thirdpay.enums.ThirdPayOrderStatusEnum.*;
 
-
-
 /**
- * 支付宝交易状态枚举.
- * @version 1.0 2017/2/27
- * @auther <a href="mailto:lly835@163.com">廖师兄</a>
- * @since 1.0
+ * 支付宝交易状态枚举
+ * @author testjon 2020-08-05
  */
 @Getter
 public enum AlipayTradeStatusEnum {

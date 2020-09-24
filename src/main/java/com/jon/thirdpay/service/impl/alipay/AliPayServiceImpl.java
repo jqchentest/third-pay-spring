@@ -5,14 +5,8 @@ import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.domain.AlipayTradeAppPayModel;
-import com.alipay.api.request.AlipayDataDataserviceBillDownloadurlQueryRequest;
-import com.alipay.api.request.AlipayTradeAppPayRequest;
-import com.alipay.api.request.AlipayTradeQueryRequest;
-import com.alipay.api.request.AlipayTradeRefundRequest;
-import com.alipay.api.response.AlipayDataDataserviceBillDownloadurlQueryResponse;
-import com.alipay.api.response.AlipayTradeAppPayResponse;
-import com.alipay.api.response.AlipayTradeQueryResponse;
-import com.alipay.api.response.AlipayTradeRefundResponse;
+import com.alipay.api.request.*;
+import com.alipay.api.response.*;
 import com.jon.thirdpay.common.BusinessException;
 import com.jon.thirdpay.common.ResponseData;
 import com.jon.thirdpay.config.AliPayConfig;
@@ -24,6 +18,7 @@ import com.jon.thirdpay.model.alipay.response.AliPayAsyncResponse;
 import com.jon.thirdpay.service.ThirdPayService;
 import com.jon.thirdpay.utils.MapUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -128,8 +123,8 @@ public class AliPayServiceImpl implements ThirdPayService {
         String tradeStatus = response.getTradeStatus();
         if (!tradeStatus.equals(AliPayConstants.TRADE_FINISHED) &&
                 !tradeStatus.equals(AliPayConstants.TRADE_SUCCESS)) {
-            log.warn("【支付宝支付异步通知】支付失败 notifyData:{},response:{}", notifyData, response);
-            throw new BusinessException("【支付宝支付异步通知】支付失败");
+            log.warn("【支付宝支付异步通知】订单未支付 notifyData:{},response:{}", notifyData, response);
+            throw new BusinessException("【支付宝支付异步通知】订单未支付");
         }
         return ThirdPayResultResponse.create(response);
     }
@@ -166,7 +161,7 @@ public class AliPayServiceImpl implements ThirdPayService {
                     aliPayConfig.getPrivateKey(), FORMAT, CHARSET, aliPayConfig.getAliPayPublicKey(), SIGN_TYPE);
             AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("out_trade_no", queryRequest.getOrderId());
+            jsonObject.put("out_trade_no", queryRequest.getTradeNo());
             jsonObject.put("trade_no", queryRequest.getOutTradeNo());
 //        jsonObject.put("org_pid","");
 
@@ -174,14 +169,19 @@ public class AliPayServiceImpl implements ThirdPayService {
             AlipayTradeQueryResponse response = alipayClient.execute(request);
             if (!response.isSuccess()) {
                 log.warn("【支付宝查询交易】, 查询失败 query:{}, response:{}", queryRequest, response);
-                throw new BusinessException("支付宝查询交易失败");
+                return null;
+            }
+            String finishTime = null;
+            if (response.getSendPayDate() != null) {
+                finishTime =
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.ofInstant(response.getSendPayDate().toInstant(), ZoneId.systemDefault()));
             }
             return ThirdPayQueryResponse.builder()
                     .thirdPayOrderStatusEnum(AlipayTradeStatusEnum.findByName(response.getTradeStatus()).getThirdPayOrderStatusEnum())
                     .outTradeNo(response.getTradeNo())
                     .orderId(response.getOutTradeNo())
                     .resultMsg(response.getMsg())
-                    .finishTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.ofInstant(response.getSendPayDate().toInstant(), ZoneId.systemDefault())))
+                    .finishTime(finishTime)
                     .build();
         } catch (BusinessException e) {
             throw e;
@@ -220,5 +220,30 @@ public class AliPayServiceImpl implements ThirdPayService {
     @Override
     public String getQrCodeUrl(String productId) {
         return null;
+    }
+
+    @Override
+    public ThirdPayTransferToAccountResponse transferToAccount(ThirdPayTransferToAccountRequest request) throws AlipayApiException {
+        AlipayClient alipayClient = new DefaultAlipayClient(aliPayConfig.getAPIServerUrl(), aliPayConfig.getAppId(),
+                aliPayConfig.getPrivateKey(), FORMAT, CHARSET, aliPayConfig.getAliPayPublicKey(), SIGN_TYPE);
+        AlipayFundTransToaccountTransferRequest alipayRequest = new AlipayFundTransToaccountTransferRequest();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("out_biz_no", request.getTransferNo());
+        jsonObject.put("payee_type", "ALIPAY_LOGONID");
+        jsonObject.put("payee_account", request.getPayeeAccount());
+        jsonObject.put("amount", request.getTransferAmount());
+        jsonObject.put("payee_real_name", request.getPayeeRealName());
+        jsonObject.put("remark", request.getRemark());
+
+        alipayRequest.setBizContent(jsonObject.toJSONString());
+        AlipayFundTransToaccountTransferResponse response = alipayClient.execute(alipayRequest);
+        if (!response.isSuccess()) {
+            log.warn("【转账至支付宝账户】, 转账失败 query:{}", response);
+            if (!StringUtils.isEmpty(response.getSubMsg())) {
+                throw new BusinessException(response.getSubMsg());
+            }
+            throw new BusinessException("转账至支付宝账户失败");
+        }
+        return ThirdPayTransferToAccountResponse.create(response);
     }
 }

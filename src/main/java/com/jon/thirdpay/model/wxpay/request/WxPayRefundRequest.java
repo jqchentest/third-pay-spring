@@ -6,8 +6,7 @@ import org.simpleframework.xml.Root;
 
 /**
  * 微信支付 退款请求参数
- * Created by 廖师兄
- * 2018-05-31 17:47
+ * @author testjon 2020-08-05
  */
 @Data
 @Root(name = "xml", strict = false)

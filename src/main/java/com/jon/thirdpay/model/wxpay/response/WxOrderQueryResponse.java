@@ -6,8 +6,6 @@ import org.simpleframework.xml.Root;
 
 /**
  * 微信支付 订单查询响应信息
- * Created by 廖师兄
- * 2018-05-31 17:40
  */
 @Data
 @Root(name = "xml", strict = false)

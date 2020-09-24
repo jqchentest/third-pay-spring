@@ -216,7 +216,7 @@ public class WxPayServiceImpl implements ThirdPayService {
         try {
 
             WxOrderQueryRequest wxRequest = new WxOrderQueryRequest();
-            wxRequest.setOutTradeNo(request.getOrderId());
+            wxRequest.setOutTradeNo(request.getTradeNo());
             wxRequest.setTransactionId(request.getOutTradeNo());
 
             wxRequest.setAppid(wxPayConfig.getAppId());
@@ -230,7 +230,7 @@ public class WxPayServiceImpl implements ThirdPayService {
             Response<WxOrderQueryResponse> retrofitResponse = call.execute();
             if (!retrofitResponse.isSuccessful()) {
                 log.warn("【微信订单查询】, 调用失败, request:{} ,response:{}", request, retrofitResponse);
-                throw new BusinessException("微信订单查询, 网络异常");
+                return null;
             }
             WxOrderQueryResponse response = retrofitResponse.body();
 
@@ -240,13 +240,19 @@ public class WxPayServiceImpl implements ThirdPayService {
                 log.warn("【微信订单查询】, 查询失败, request:{} ,response:{}", request, response);
                 return null;
             }
+
+            String finishTime = null;
+            if (response.getTimeEnd() != null) {
+                finishTime =
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.parse(response.getTimeEnd(), DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+            }
             return ThirdPayQueryResponse.builder()
                     .thirdPayOrderStatusEnum(ThirdPayOrderStatusEnum.findByName(response.getTradeState()))
                     .resultMsg(response.getTradeStateDesc())
                     .outTradeNo(response.getTransactionId())
                     .orderId(response.getOutTradeNo())
                     .attach(response.getAttach())
-                    .finishTime(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.parse(response.getTimeEnd(), DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))))
+                    .finishTime(finishTime)
                     .build();
         } catch (BusinessException e) {
             throw e;
@@ -329,6 +335,11 @@ public class WxPayServiceImpl implements ThirdPayService {
                 + "&time_stamp=" + timeStamp
                 + "&nonce_str=" + nonceStr
                 + "&sign=" + WxPaySignature.sign(map, wxPayConfig.getMchKey());
+    }
+
+    @Override
+    public ThirdPayTransferToAccountResponse transferToAccount(ThirdPayTransferToAccountRequest request) {
+        throw new BusinessException("暂不支持微信");
     }
 
 }

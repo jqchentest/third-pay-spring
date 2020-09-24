@@ -6,8 +6,6 @@ import org.simpleframework.xml.Root;
 
 /**
  * 微信退款返回参数
- * Created by 廖师兄
- * 2017-07-02 13:33
  */
 @Data
 @Root(name = "xml", strict = false) //name:要解析的xml数据的头部

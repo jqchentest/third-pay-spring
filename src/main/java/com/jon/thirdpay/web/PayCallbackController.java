@@ -54,7 +54,7 @@ public class PayCallbackController {
      * 支付宝支付回调接口
      */
     @RequestMapping(value = "aliPay/payCallBack", method = RequestMethod.POST)
-    public void aliPayCallBack(HttpServletRequest request, HttpServletResponse response) {
+    public String aliPayCallBack(HttpServletRequest request, HttpServletResponse response) {
         try (ServletInputStream inputStream = request.getInputStream();
              ServletOutputStream outputStream = response.getOutputStream()) {
             String notifyData = IOUtils.toString(inputStream);
@@ -62,15 +62,16 @@ public class PayCallbackController {
             log.info(">>>>>>>>> 【支付宝支付回调】>>>>>>>>>>> notifyData:{}", notifyData);
             if (StringUtils.isEmpty(notifyData)) {
                 log.warn(">>>>>>>>> 【支付宝支付回调】回调内容为空 request: {} ", request);
-                return;
+                return "fail";
             }
             payCallbackService.payCallback(notifyData, ThirdPayTypeEnum.ALIPAY_APP);
             log.info(">>>>>>>>>>【支付宝支付回调】<<<<<<<<<<<<<<<  success ");
 
-            outputStream.println("success");
+            return "success";
         } catch (Exception e) {
             log.error(">>>>>>>>> 【支付宝支付回调】发生异常 request: {}, e: ", request, e);
         }
+        return "fail";
     }
 
 }
