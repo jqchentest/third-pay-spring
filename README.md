@@ -1,7 +1,7 @@
 # 第三方支付接入demo
 微信支付、支付宝支付常用接口，spring版; 配置即可用, 无需修改  
 ```
-com.jon.thirdpay.pay: 只包含第三方支付相关代码(目的是为了方便集成，无需关注业务)  
+com.jon.thirdpay.pay: 只包含第三方支付相关代码(目的是为了方便集成和剥离，无需关注业务)  
 com.jon.thirdpay.business: 包含第三方支付回调业务处理相关demo
 ```
 
