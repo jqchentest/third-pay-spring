@@ -1,10 +1,9 @@
 package com.jon.thirdpay;
 
-import com.jon.thirdpay.common.ResponseData;
-import com.jon.thirdpay.enums.ThirdPayTypeEnum;
-import com.jon.thirdpay.model.ThirdPayRequest;
-import com.jon.thirdpay.service.ThirdPayService;
-import com.jon.thirdpay.service.ThirdPayServiceFactory;
+import com.jon.thirdpay.pay.enums.ThirdPayTypeEnum;
+import com.jon.thirdpay.pay.model.ThirdPayRequest;
+import com.jon.thirdpay.pay.service.ThirdPayService;
+import com.jon.thirdpay.pay.service.ThirdPayServiceFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +28,8 @@ public class AliPayTest extends BaseTest{
         thirdPayRequest.setTradeNo("123");
         thirdPayRequest.setPayTypeEnum(ThirdPayTypeEnum.ALIPAY_APP);
         thirdPayRequest.setOrderTitle("这是一个商品标题");
-        ResponseData pay = getService().pay(thirdPayRequest);
-        Assert.assertNotNull(pay.getData());
+        Object pay = getService().pay(thirdPayRequest);
+        Assert.assertNotNull(pay);
         System.out.println(pay);
     }
 }

@@ -1,11 +1,10 @@
 package com.jon.thirdpay;
 
-import com.jon.thirdpay.common.ResponseData;
-import com.jon.thirdpay.enums.ThirdPayTypeEnum;
-import com.jon.thirdpay.model.*;
-import com.jon.thirdpay.model.wxpay.response.WxCreateOrderResponse;
-import com.jon.thirdpay.service.ThirdPayService;
-import com.jon.thirdpay.service.ThirdPayServiceFactory;
+import com.jon.thirdpay.pay.enums.ThirdPayTypeEnum;
+import com.jon.thirdpay.pay.model.*;
+import com.jon.thirdpay.pay.model.wxpay.response.WxCreateOrderResponse;
+import com.jon.thirdpay.pay.service.ThirdPayService;
+import com.jon.thirdpay.pay.service.ThirdPayServiceFactory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,7 +29,7 @@ public class WxPayServiceTest extends BaseTest {
         thirdPayRequest.setTradeNo("1");
         thirdPayRequest.setPayTypeEnum(ThirdPayTypeEnum.WXPAY_APP);
         thirdPayRequest.setOrderTitle("这是一个商品标题");
-        ResponseData<WxCreateOrderResponse> pay = getService().pay(thirdPayRequest);
+        WxCreateOrderResponse pay = (WxCreateOrderResponse) getService().pay(thirdPayRequest);
         System.out.println(pay);
     }
 
