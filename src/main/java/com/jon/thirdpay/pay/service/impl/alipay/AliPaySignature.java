@@ -23,10 +23,25 @@ public class AliPaySignature {
         try {
             return AlipaySignature.rsaCheckV1(params, publicKey, "UTF-8", "RSA2");
         } catch (AlipayApiException e) {
-            log.error("【支付宝支付校验签名】, 发生异常 params:{}, publicKey:{}, e:", params, publicKey,e);
+            log.error("【支付宝支付校验签名】, 发生异常 params:{}, publicKey:{}, e:", params, publicKey, e);
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * 根据证书校验签名
+     *
+     * @param params
+     * @param alipayPublicCertPath
+     * @return
+     */
+    public static Boolean certVerify(Map<String, String> params, String alipayPublicCertPath) throws RuntimeException {
+        try {
+            return AlipaySignature.rsaCertCheckV1(params, alipayPublicCertPath, "UTF-8", "RSA2");
+        } catch (AlipayApiException e) {
+            log.error("【支付宝支付校验签名】, 发生异常 params:{}, alipayPublicCertPath:{}, e:", params, alipayPublicCertPath, e);
+            throw new RuntimeException(e);
+        }
+    }
 
 }

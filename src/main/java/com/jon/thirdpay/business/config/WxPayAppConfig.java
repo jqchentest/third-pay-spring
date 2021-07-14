@@ -1,5 +1,6 @@
-package com.jon.thirdpay.pay.config;
+package com.jon.thirdpay.business.config;
 
+import com.jon.thirdpay.pay.config.WxPayConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * 微信APP支付配置
  *
- * @author testjon 2020-08-04
+ * @author testjon 2021-07-14
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -17,42 +18,42 @@ import org.springframework.stereotype.Component;
 @Component
 public class WxPayAppConfig extends WxPayConfig {
     @Override
-    @Value("${road.thirdPay.app.wxPay.appId}")
+    @Value("${jon.thirdPay.app.wxPay.appId}")
     public void setAppId(String appId) {
         super.setAppId(appId);
     }
 
     @Override
-    @Value("${road.thirdPay.app.wxPay.appSecret}")
+    @Value("${jon.thirdPay.app.wxPay.appSecret}")
     public void setAppSecret(String appSecret) {
         super.setAppSecret(appSecret);
     }
 
     @Override
-    @Value("${road.thirdPay.app.wxPay.mchId}")
+    @Value("${jon.thirdPay.app.wxPay.mchId}")
     public void setMchId(String mchId) {
         super.setMchId(mchId);
     }
 
     @Override
-    @Value("${road.thirdPay.app.wxPay.mchKey}")
+    @Value("${jon.thirdPay.app.wxPay.mchKey}")
     public void setMchKey(String mchKey) {
         super.setMchKey(mchKey);
     }
 
     @Override
-    @Value("${road.thirdPay.app.wxPay.keyPath}")
+    @Value("${jon.thirdPay.app.wxPay.keyPath}")
     public void setKeyPath(String keyPath) {
         super.setKeyPath(keyPath);
     }
 
-    @Value("${road.thirdPay.app.wxPay.sandbox}")
+    @Value("${jon.thirdPay.app.wxPay.sandbox}")
     @Override
     public void setSandbox(boolean sandbox) {
         super.setSandbox(sandbox);
     }
 
-    @Value("${road.thirdPay.app.wxPay.notifyUrl}")
+    @Value("${jon.thirdPay.app.wxPay.notifyUrl}")
     @Override
     public void setNotifyUrl(String notifyUrl) {
         super.setNotifyUrl(notifyUrl);

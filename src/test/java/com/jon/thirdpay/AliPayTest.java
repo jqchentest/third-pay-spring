@@ -3,7 +3,7 @@ package com.jon.thirdpay;
 import com.jon.thirdpay.pay.enums.ThirdPayTypeEnum;
 import com.jon.thirdpay.pay.model.ThirdPayRequest;
 import com.jon.thirdpay.pay.service.ThirdPayService;
-import com.jon.thirdpay.pay.service.ThirdPayServiceFactory;
+import com.jon.thirdpay.business.config.ThirdPayServiceFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

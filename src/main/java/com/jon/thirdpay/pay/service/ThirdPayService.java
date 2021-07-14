@@ -2,6 +2,8 @@ package com.jon.thirdpay.pay.service;
 
 import com.jon.thirdpay.pay.enums.SignType;
 import com.jon.thirdpay.pay.model.*;
+import com.vdurmont.emoji.EmojiParser;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
@@ -28,6 +30,7 @@ public interface ThirdPayService {
 
     /**
      * 异步回调
+     *
      * @param notifyData
      * @return
      */
@@ -35,6 +38,7 @@ public interface ThirdPayService {
 
     /**
      * 退款
+     *
      * @param request
      * @return
      */
@@ -42,6 +46,7 @@ public interface ThirdPayService {
 
     /**
      * 查询订单
+     *
      * @param request
      * @return
      */
@@ -50,6 +55,7 @@ public interface ThirdPayService {
 
     /**
      * 下载对账单
+     *
      * @param request
      * @return
      */
@@ -58,6 +64,7 @@ public interface ThirdPayService {
 
     /**
      * 根据规则生成二维码URL
+     *
      * @param productId 商品ID
      * @return 二维码中的内容为链接
      */
@@ -65,9 +72,27 @@ public interface ThirdPayService {
 
     /**
      * 转账至第三方账户
+     *
      * @param request
      * @return
      */
     ThirdPayTransferToAccountResponse transferToAccount(ThirdPayTransferToAccountRequest request) throws Exception;
+
+    /**
+     * 获取订单标题
+     * 过滤所有emoji表情;
+     *
+     * @param tradeNo     订单号
+     * @param originTitle 原标题
+     * @return 如果最终为空字符串；返回订单号（订单：xxxx）
+     */
+    default String getOrderTitle(String originTitle, String tradeNo) {
+
+        final String s = EmojiParser.removeAllEmojis(originTitle);
+        if (s.length() > 20) {
+            return s.substring(0, 18) + "..";
+        }
+        return StringUtils.isEmpty(s) ? "订单:" + tradeNo : s;
+    }
 
 }

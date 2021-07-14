@@ -1,5 +1,6 @@
-package com.jon.thirdpay.pay.config;
+package com.jon.thirdpay.business.config;
 
+import com.jon.thirdpay.pay.config.AliPayConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * 支付宝APP支付配置
  *
- * @author testjon 2020-08-05
+ * @author testjon 2021-07-14
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -18,30 +19,30 @@ public class AliPayAppConfig extends AliPayConfig {
 
 
     @Override
-    @Value("${road.thirdPay.app.aliPay.appid}")
+    @Value("${jon.thirdPay.app.aliPay.appid}")
     public void setAppId(String appId) {
         super.setAppId(appId);
     }
 
     @Override
-    @Value("${road.thirdPay.app.aliPay.privateKey}")
+    @Value("${jon.thirdPay.app.aliPay.privateKey}")
     public void setPrivateKey(String privateKey) {
         super.setPrivateKey(privateKey);
     }
 
     @Override
-    @Value("${road.thirdPay.app.aliPay.publicKey}")
+    @Value("${jon.thirdPay.app.aliPay.publicKey}")
     public void setAliPayPublicKey(String aliPayPublicKey) {
         super.setAliPayPublicKey(aliPayPublicKey);
     }
 
-    @Value("${road.thirdPay.app.aliPay.sandbox}")
+    @Value("${jon.thirdPay.app.aliPay.sandbox}")
     @Override
     public void setSandbox(boolean sandbox) {
         super.setSandbox(sandbox);
     }
 
-    @Value("${road.thirdPay.app.aliPay.notifyUrl}")
+    @Value("${jon.thirdPay.app.aliPay.notifyUrl}")
     @Override
     public void setNotifyUrl(String notifyUrl) {
         super.setNotifyUrl(notifyUrl);

@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by this on 2019/9/8 15:50
+ * @author testjon 2021-07-14
  */
 @Slf4j
 public class AliPayServiceImpl implements ThirdPayService {
@@ -73,7 +73,7 @@ public class AliPayServiceImpl implements ThirdPayService {
         //SDK已经封装掉了公共参数，这里只需要传入业务参数。以下方法为sdk的model入参方式(model和biz_content同时存在的情况下取biz_content)。
         AlipayTradeAppPayModel model = new AlipayTradeAppPayModel();
         //model.setBody("商品详情");
-        model.setSubject(thirdPayRequest.getOrderTitle());
+        model.setSubject(getOrderTitle(thirdPayRequest.getOrderTitle(), thirdPayRequest.getTradeNo()));
         model.setOutTradeNo(thirdPayRequest.getTradeNo());
         model.setTimeoutExpress(TIMEOUT_EXPRESS);
         model.setTotalAmount(thirdPayRequest.getOrderAmount().toString());
@@ -138,6 +138,12 @@ public class AliPayServiceImpl implements ThirdPayService {
         jsonObject.put("out_trade_no", thirdPayRefundRequest.getTradeNo());
         jsonObject.put("trade_no", thirdPayRefundRequest.getOutTradeNo());
         jsonObject.put("refund_amount", thirdPayRefundRequest.getRefundAmount());
+
+        //部分退款
+        if (!StringUtils.isEmpty(thirdPayRefundRequest.getPartialRefundNo())) {
+            jsonObject.put("out_request_no", thirdPayRefundRequest.getPartialRefundNo());
+        }
+
         request.setBizContent(jsonObject.toJSONString());
         AlipayTradeRefundResponse response = null;
         try {
@@ -148,6 +154,9 @@ public class AliPayServiceImpl implements ThirdPayService {
         }
         if (!response.isSuccess()) {
             log.warn("【支付宝退款】退款失败, request:{}, response:{}", thirdPayRefundRequest, response);
+            if (!StringUtils.isEmpty(response.getSubMsg())) {
+                throw new BusinessException(response.getSubMsg());
+            }
             throw new BusinessException("支付宝退款失败,请稍后再试");
         }
         return ThirdPayRefundResponse.create(response);

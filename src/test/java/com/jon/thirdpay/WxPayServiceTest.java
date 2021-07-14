@@ -4,7 +4,7 @@ import com.jon.thirdpay.pay.enums.ThirdPayTypeEnum;
 import com.jon.thirdpay.pay.model.*;
 import com.jon.thirdpay.pay.model.wxpay.response.WxCreateOrderResponse;
 import com.jon.thirdpay.pay.service.ThirdPayService;
-import com.jon.thirdpay.pay.service.ThirdPayServiceFactory;
+import com.jon.thirdpay.business.config.ThirdPayServiceFactory;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

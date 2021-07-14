@@ -77,7 +77,7 @@ public class WxPayServiceImpl implements ThirdPayService {
             WxPayUnifiedorderRequest wxRequest = new WxPayUnifiedorderRequest();
             wxRequest.setOutTradeNo(request.getTradeNo());
             wxRequest.setTotalFee(MoneyUtil.Yuan2Fen(request.getOrderAmount()));
-            wxRequest.setBody(request.getOrderTitle());
+            wxRequest.setBody(getOrderTitle(request.getOrderTitle(), request.getTradeNo()));
             wxRequest.setOpenid(request.getOpenid());
             wxRequest.setTradeType(request.getPayTypeEnum().getCode());
             wxRequest.setAppid(wxPayConfig.getAppId());
@@ -105,7 +105,7 @@ public class WxPayServiceImpl implements ThirdPayService {
                 throw new BusinessException("微信统一下单失败, 请稍后再试");
             }
 
-            return WxCreateOrderResponse.create(response, wxPayConfig.getMchKey());
+            return WxCreateOrderResponse.create(response, wxPayConfig.getMchKey(), request.getPayTypeEnum());
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
@@ -161,13 +161,14 @@ public class WxPayServiceImpl implements ThirdPayService {
      * @param request
      * @return
      */
+    @Override
     public ThirdPayRefundResponse refund(ThirdPayRefundRequest request) {
         try {
             WxPayRefundRequest wxRequest = new WxPayRefundRequest();
             wxRequest.setOutTradeNo(request.getTradeNo());
             wxRequest.setOutRefundNo(request.getTradeNo());
             wxRequest.setTransactionId(request.getOutTradeNo());
-            wxRequest.setTotalFee(MoneyUtil.Yuan2Fen(request.getRefundAmount()));
+            wxRequest.setTotalFee(MoneyUtil.Yuan2Fen(request.getOrderAmount()));
             wxRequest.setRefundFee(MoneyUtil.Yuan2Fen(request.getRefundAmount()));
 
             wxRequest.setAppid(wxPayConfig.getAppId());
@@ -192,6 +193,9 @@ public class WxPayServiceImpl implements ThirdPayService {
             assert response != null;
             if (!response.getReturnCode().equals(WxPayConstants.SUCCESS) || !response.getResultCode().equals(WxPayConstants.SUCCESS)) {
                 log.warn("【微信退款】退款失败, request:{}, response:{}", request, response);
+                if (!StringUtils.isEmpty(response.getReturnMsg())) {
+                    throw new BusinessException(response.getReturnMsg());
+                }
                 throw new BusinessException("微信退款失败,请稍后再试");
             }
 

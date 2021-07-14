@@ -4,7 +4,7 @@ import com.jon.thirdpay.business.dto.PayCallbackResultDTO;
 import com.jon.thirdpay.common.BusinessException;
 import com.jon.thirdpay.pay.enums.ThirdPayTypeEnum;
 import com.jon.thirdpay.pay.model.ThirdPayResultResponse;
-import com.jon.thirdpay.pay.service.ThirdPayServiceFactory;
+import com.jon.thirdpay.business.config.ThirdPayServiceFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

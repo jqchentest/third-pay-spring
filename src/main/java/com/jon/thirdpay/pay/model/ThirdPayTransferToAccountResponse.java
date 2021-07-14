@@ -1,12 +1,13 @@
 package com.jon.thirdpay.pay.model;
 
 import com.alipay.api.response.AlipayFundTransToaccountTransferResponse;
+import com.alipay.api.response.AlipayFundTransUniTransferResponse;
 import lombok.Data;
 
 /**
  * 支付订单查询请求参数
  *
- * @author testjon 2020-08-05
+ * @author testjon 2021-07-14
  */
 @Data
 public class ThirdPayTransferToAccountResponse {
@@ -29,6 +30,14 @@ public class ThirdPayTransferToAccountResponse {
         ThirdPayTransferToAccountResponse response = new ThirdPayTransferToAccountResponse();
         response.setTransferNo(bean.getOutBizNo());
         response.setPayTime(bean.getPayDate());
+        response.setOutTransferNo(bean.getOrderId());
+        return response;
+    }
+
+    public static ThirdPayTransferToAccountResponse create(AlipayFundTransUniTransferResponse bean) {
+        ThirdPayTransferToAccountResponse response = new ThirdPayTransferToAccountResponse();
+        response.setTransferNo(bean.getOutBizNo());
+        response.setPayTime(bean.getTransDate());
         response.setOutTransferNo(bean.getOrderId());
         return response;
     }
