@@ -8,7 +8,7 @@ com.jon.thirdpay.business: 包含第三方支付回调业务处理相关demo
 最初基于 _https://github.com/Pay-Group/best-pay-sdk_  此开源项目做了修改
 
 ## 支持接口
-#### 支付宝
+#### 支付宝(支持普通公钥/证书方式)
     1 发起支付
     2 验证支付结果
     3 异步回调通知
@@ -18,7 +18,7 @@ com.jon.thirdpay.business: 包含第三方支付回调业务处理相关demo
     7 转账到支付宝账户
     
 
-#### 微信
+#### 微信（支持微信APP/JS/小程序）
     1 发起支付
     2 验证支付结果
     3 异步回调通知
