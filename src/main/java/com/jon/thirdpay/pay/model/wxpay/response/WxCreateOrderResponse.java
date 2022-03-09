@@ -47,6 +47,11 @@ public class WxCreateOrderResponse {
      */
     private String sign;
 
+    /**
+     * 支付跳转链接
+     * mweb_url为拉起微信支付收银台的中间页面，可通过访问该url来拉起微信客户端，完成支付,mweb_url的有效期为5分钟。
+     */
+    private String mWebUrl;
 
     /**
      * 返回微信统一下单返回结果参数；
@@ -55,8 +60,11 @@ public class WxCreateOrderResponse {
     public static WxCreateOrderResponse create(WxUnifiedOrderResponse response,
                                                String mchKey,
                                                ThirdPayTypeEnum payTypeEnum) {
-        if (ThirdPayTypeEnum.WXPAY_MINI.equals(payTypeEnum)) {
-            return getMiniPayResponse(response, mchKey);
+        if (ThirdPayTypeEnum.WXPAY_MINI.equals(payTypeEnum) || ThirdPayTypeEnum.WXPAY_MP.equals(payTypeEnum)) {
+            return getJsApiPayResponse(response, mchKey);
+        }
+        if (ThirdPayTypeEnum.WXPAY_H5.equals(payTypeEnum)) {
+            return getH5PayResponse(response, mchKey);
         }
         return getAppPayResponse(response, mchKey);
     }
@@ -94,7 +102,7 @@ public class WxCreateOrderResponse {
     /**
      * 小程序再次加签后返回结果
      */
-    private static WxCreateOrderResponse getMiniPayResponse(WxUnifiedOrderResponse response, String mchKey) {
+    private static WxCreateOrderResponse getJsApiPayResponse(WxUnifiedOrderResponse response, String mchKey) {
         String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
         String nonceStr = RandomUtil.getRandomStr();
         String prepayId = response.getPrepayId();
@@ -117,6 +125,24 @@ public class WxCreateOrderResponse {
         payResponse.setNonceStr(nonceStr);
         payResponse.setTimeStamp(timeStamp);
         payResponse.setSign(WxPaySignature.sign(map, mchKey));
+        return payResponse;
+    }
+
+    /**
+     * H5支付返回结果
+     */
+    private static WxCreateOrderResponse getH5PayResponse(WxUnifiedOrderResponse response, String mchKey) {
+        String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
+
+        //返回的内容
+        WxCreateOrderResponse payResponse = new WxCreateOrderResponse();
+        payResponse.setAppId(response.getAppid());
+        payResponse.setPartnerId(response.getMchId());
+        payResponse.setPrepayId(response.getPrepayId());
+        payResponse.setNonceStr(response.getNonceStr());
+        payResponse.setTimeStamp(timeStamp);
+        payResponse.setMWebUrl(response.getMwebUrl());
+        payResponse.setSign(response.getSign());
         return payResponse;
     }
 }
