@@ -32,7 +32,7 @@ public class ThirdPayServiceConfig {
      * 证书方式
      */
     @Bean(name = "aliPayAppCertService")
-    public ThirdPayService aliPayAppService(AliPayAppCertConfig config) {
+    public ThirdPayService aliPayAppCertService(AliPayAppCertConfig config) {
         return new AliPayCertServiceImpl(config);
     }
 }
